@@ -1,13 +1,11 @@
 package com.app.maffan.bookbank;
 
 import java.util.List;
-import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.Property;
-import org.greenrobot.greendao.internal.SqlUtils;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
@@ -30,7 +28,6 @@ public class BookDao extends AbstractDao<Book, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
         public final static Property Price = new Property(2, String.class, "price", false, "PRICE");
-        public final static Property Publisher_id = new Property(3, long.class, "publisher_id", false, "PUBLISHER_ID");
     }
 
     private DaoSession daoSession;
@@ -52,8 +49,7 @@ public class BookDao extends AbstractDao<Book, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"BOOK\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"TITLE\" TEXT NOT NULL ," + // 1: title
-                "\"PRICE\" TEXT NOT NULL ," + // 2: price
-                "\"PUBLISHER_ID\" INTEGER NOT NULL );"); // 3: publisher_id
+                "\"PRICE\" TEXT NOT NULL );"); // 2: price
     }
 
     /** Drops the underlying database table. */
@@ -72,7 +68,6 @@ public class BookDao extends AbstractDao<Book, Long> {
         }
         stmt.bindString(2, entity.getTitle());
         stmt.bindString(3, entity.getPrice());
-        stmt.bindLong(4, entity.getPublisher_id());
     }
 
     @Override
@@ -85,7 +80,6 @@ public class BookDao extends AbstractDao<Book, Long> {
         }
         stmt.bindString(2, entity.getTitle());
         stmt.bindString(3, entity.getPrice());
-        stmt.bindLong(4, entity.getPublisher_id());
     }
 
     @Override
@@ -104,8 +98,7 @@ public class BookDao extends AbstractDao<Book, Long> {
         Book entity = new Book( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getString(offset + 1), // title
-            cursor.getString(offset + 2), // price
-            cursor.getLong(offset + 3) // publisher_id
+            cursor.getString(offset + 2) // price
         );
         return entity;
     }
@@ -115,7 +108,6 @@ public class BookDao extends AbstractDao<Book, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setTitle(cursor.getString(offset + 1));
         entity.setPrice(cursor.getString(offset + 2));
-        entity.setPublisher_id(cursor.getLong(offset + 3));
      }
     
     @Override
@@ -158,97 +150,4 @@ public class BookDao extends AbstractDao<Book, Long> {
         return query.list();
     }
 
-    private String selectDeep;
-
-    protected String getSelectDeep() {
-        if (selectDeep == null) {
-            StringBuilder builder = new StringBuilder("SELECT ");
-            SqlUtils.appendColumns(builder, "T", getAllColumns());
-            builder.append(',');
-            SqlUtils.appendColumns(builder, "T0", daoSession.getPublisherDao().getAllColumns());
-            builder.append(" FROM BOOK T");
-            builder.append(" LEFT JOIN PUBLISHER T0 ON T.\"PUBLISHER_ID\"=T0.\"_id\"");
-            builder.append(' ');
-            selectDeep = builder.toString();
-        }
-        return selectDeep;
-    }
-    
-    protected Book loadCurrentDeep(Cursor cursor, boolean lock) {
-        Book entity = loadCurrent(cursor, 0, lock);
-        int offset = getAllColumns().length;
-
-        Publisher publisher = loadCurrentOther(daoSession.getPublisherDao(), cursor, offset);
-         if(publisher != null) {
-            entity.setPublisher(publisher);
-        }
-
-        return entity;    
-    }
-
-    public Book loadDeep(Long key) {
-        assertSinglePk();
-        if (key == null) {
-            return null;
-        }
-
-        StringBuilder builder = new StringBuilder(getSelectDeep());
-        builder.append("WHERE ");
-        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
-        String sql = builder.toString();
-        
-        String[] keyArray = new String[] { key.toString() };
-        Cursor cursor = db.rawQuery(sql, keyArray);
-        
-        try {
-            boolean available = cursor.moveToFirst();
-            if (!available) {
-                return null;
-            } else if (!cursor.isLast()) {
-                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
-            }
-            return loadCurrentDeep(cursor, true);
-        } finally {
-            cursor.close();
-        }
-    }
-    
-    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
-    public List<Book> loadAllDeepFromCursor(Cursor cursor) {
-        int count = cursor.getCount();
-        List<Book> list = new ArrayList<Book>(count);
-        
-        if (cursor.moveToFirst()) {
-            if (identityScope != null) {
-                identityScope.lock();
-                identityScope.reserveRoom(count);
-            }
-            try {
-                do {
-                    list.add(loadCurrentDeep(cursor, false));
-                } while (cursor.moveToNext());
-            } finally {
-                if (identityScope != null) {
-                    identityScope.unlock();
-                }
-            }
-        }
-        return list;
-    }
-    
-    protected List<Book> loadDeepAllAndCloseCursor(Cursor cursor) {
-        try {
-            return loadAllDeepFromCursor(cursor);
-        } finally {
-            cursor.close();
-        }
-    }
-    
-
-    /** A raw-style query where you can pass any WHERE clause and arguments. */
-    public List<Book> queryDeep(String where, String... selectionArg) {
-        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
-        return loadDeepAllAndCloseCursor(cursor);
-    }
- 
 }

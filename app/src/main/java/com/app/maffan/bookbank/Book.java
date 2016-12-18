@@ -24,11 +24,8 @@ public class Book {
     @NotNull
     private String price;
 
-    private long publisher_id;
 
-    @ToOne(joinProperty = "publisher_id")
-    private Publisher publisher;
-
+    
     @ToMany
     @JoinEntity(
             entity = JoinBookWithAuthor.class,
@@ -42,13 +39,11 @@ public class Book {
     @Generated(hash = 1097957864)
     private transient BookDao myDao;
 
-    @Generated(hash = 1030389255)
-    public Book(Long id, @NotNull String title, @NotNull String price,
-            long publisher_id) {
+    @Generated(hash = 1460337253)
+    public Book(Long id, @NotNull String title, @NotNull String price) {
         this.id = id;
         this.title = title;
         this.price = price;
-        this.publisher_id = publisher_id;
     }
 
     @Generated(hash = 1839243756)
@@ -79,50 +74,6 @@ public class Book {
         this.price = price;
     }
 
-    public long getPublisher_id() {
-        return this.publisher_id;
-    }
-
-    public void setPublisher_id(long publisher_id) {
-        this.publisher_id = publisher_id;
-    }
-
-    @Generated(hash = 1620969188)
-    private transient Long publisher__resolvedKey;
-
-    /** To-one relationship, resolved on first access. */
-    @Generated(hash = 732316418)
-    public Publisher getPublisher() {
-        long __key = this.publisher_id;
-        if (publisher__resolvedKey == null
-                || !publisher__resolvedKey.equals(__key)) {
-            final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            PublisherDao targetDao = daoSession.getPublisherDao();
-            Publisher publisherNew = targetDao.load(__key);
-            synchronized (this) {
-                publisher = publisherNew;
-                publisher__resolvedKey = __key;
-            }
-        }
-        return publisher;
-    }
-
-    /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 1670598531)
-    public void setPublisher(@NotNull Publisher publisher) {
-        if (publisher == null) {
-            throw new DaoException(
-                    "To-one property 'publisher_id' has not-null constraint; cannot set to-one to null");
-        }
-        synchronized (this) {
-            this.publisher = publisher;
-            publisher_id = publisher.getId();
-            publisher__resolvedKey = publisher_id;
-        }
-    }
 
     /**
      * To-many relationship, resolved on first access (and after reset).

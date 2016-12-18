@@ -1,7 +1,6 @@
 package com.app.maffan.bookbank;
 
 
-import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -13,17 +12,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
-import android.widget.ToggleButton;
+
 
 public class MainActivity extends AppCompatActivity  implements NavigationView.OnNavigationItemSelectedListener,AddUserFragment.OnFragmentInteractionListener,AddBookFragment.OnBookFragmentInteractionListener,AddAuthorFragment.OnAddAuthorFragmentInteractoin {
 
-    private DaoSession daoSession;
-    private PublisherDao publisherDao;
+
     private Fragment fragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +46,6 @@ public class MainActivity extends AppCompatActivity  implements NavigationView.O
         return true;
     }
 
-    public void setupDb(){
-
-        daoSession = ((App) getApplication()).getDaoSession();
-
-    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -90,6 +80,9 @@ public class MainActivity extends AppCompatActivity  implements NavigationView.O
             }
             case R.id.nav_all_authors:{
 
+                fragment = new AllAuthorFragment();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content,fragment).commit();
 
                 break;
             }
