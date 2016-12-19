@@ -166,13 +166,6 @@ public class AddBookFragment extends Fragment  {
         });
 
 
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-
         dialog.create();
         dialog.show();
     }

@@ -6,6 +6,7 @@
     <TextView
         android:text="Book Name"
         android:textSize="25sp"
+        android:textColor="#454545"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
@@ -19,10 +20,11 @@
     <TextView
         android:text="$15.50"
         android:textSize="15sp"
+        android:textColor="#454545"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title"
         android:layout_alignLeft="@+id/title"
         android:layout_alignStart="@+id/title"
-        android:id="@+id/textView8" />
+        android:id="@+id/price" />
 </RelativeLayout>

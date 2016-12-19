@@ -88,7 +88,9 @@ public class MainActivity extends AppCompatActivity  implements NavigationView.O
             }
             case R.id.nav_all_books: {
 
-
+                fragment = new AllBookFragment();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content,fragment).commit();
                 break;
             }
             case R.id.nav_all_publishers: {
